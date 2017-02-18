@@ -7,6 +7,7 @@ cpuTemp0="scale=1; $(cat /sys/class/thermal/thermal_zone0/temp)/1000"
 curl -s wttr.in/$IP?lang=sv > /usr/local/bin/wttr
 motdLastUpdate=$(ls -l /etc/motd | awk {'print $8'})
 
+#service_check can be found here: https://github.com/noordan/service_check.git
 echo "$(tput sgr0)
 $(tput smul)System Status$(tput rmul)
 - IP Adresses       = $(tput dim)public:$(tput sgr0) `echo $IP`;        $(tput dim)private:$(tput sgr0)  `hostname -I`
