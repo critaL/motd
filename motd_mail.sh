@@ -3,9 +3,16 @@ export TERM=xterm-256color
 CPUTIME=$(ps -eo pcpu | awk 'NR>1' | awk '{tot=tot+$1} END {print tot}')
 CPUCORES=$(cat /proc/cpuinfo | grep -c processor)
 IP=$(curl -s -4 icanhazip.com) > /dev/null
-cpuTemp0="scale=1; $(cat /sys/class/thermal/thermal_zone0/temp)/1000"
+#cpuTemp0="scale=1; $(cat /sys/class/thermal/thermal_zone0/temp)/1000"
 curl -s wttr.in/$IP?lang=sv > /usr/local/bin/wttr
-motdLastUpdate=$(ls -l /etc/motd | awk {'print $8'})
+motdLastUpdate=$(date)
+
+
+declare -A SERVICES=(
+  ['Webserver']='nginx'
+  ['PHP']='php7.0-fpm.service'
+  ['MySQL']='mysql'
+)
 
 #service_check can be found here: https://github.com/noordan/service_check.git
 echo "$(tput sgr0)
@@ -15,14 +22,22 @@ $(tput smul)System Status$(tput rmul)
 - Disk Space Used   = $(tput dim)internal:$(tput sgr0) `df | head -n 4 | tail -n 1 | awk {'print $5'}`;
 - Uptime            = $(tput dim)$(tput sgr0)`uptime | awk {'print $3,$4'} | cut -d ',' -f1`;
 
-$(tput smul)Service Status$(tput rmul)
-- Webserver       = `if [[ $(systemctl status nginx | grep -c "active (running)") -gt 0 ]]; then echo "$(tput setaf 2)Running$(tput sgr0)"; else python3 /home/noordan/service_check/service_check.py nginx; echo "$(tput setaf 1)Inactive$(tput sgr0)"; fi`
-- MysQL           = `if [[ $(systemctl status mysql | grep -c "active (running)") -gt 0 ]]; then echo "$(tput setaf 2)Running$(tput sgr0)"; else python3 /home/noordan/service_check/service_check.py mysql; echo "$(tput setaf 1)Inactive$(tput sgr0)"; fi`
-- PHP             = `if [[ $(systemctl status php7.0-fpm.service | grep -c "active (running)") -gt 0 ]]; then echo "$(tput setaf 2)Running$(tput sgr0)"; else python3 /home/noordan/service_check/service_check.py php7.0-fpm.service; echo "$(tput setaf 1)Inactive$(tput sgr0)"; fi`
+`echo -e "\e[4mService status\e[0m"
+for SERVICE in ${!SERVICES[@]}
+do
+  STATUS=$(sudo systemctl status ${SERVICES[$SERVICE]} --no-pager | grep -c "Active: active (running)")
+  if [[ $STATUS > 0 ]]
+  then
+    STATUSTABLE+=(" - $SERVICE $(echo -en "= \e[32m")Running$(echo -en "\e[0m")\n")
+  else
+    STATUSTABLE+=(" - $SERVICE $(echo -en "= \e[31m")Dead$(echo -en "\e[0m")\n")
+    python3 /home/noordan/service_check/service_check.py $SERVICE;
+  fi
+done
+printf "${STATUSTABLE[*]}" | column -t`
 
  `cat '/usr/local/bin/wttr' | head -n 7 | tail -n 5`
-Updated $(tput smul)$motdLastUpdate$(tput rmul)
-" > /etc/motd
+Updated $(tput smul)$motdLastUpdate$(tput rmul)" > /etc/motd
 
 
 #- PiHole            = `pihole status | head -n 2 | tail -n 1 | sed -s 's/Enabled/working/g' | sed -s 's/Disabled/inactive/g' | grep -Eo 'working|inactive' | sed "s,working,$(tput setaf 2)&$(tput sgr0)," | sed "s,inactive,$(tput setaf 1)&$(tput sgr0),"`
