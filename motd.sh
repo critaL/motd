@@ -12,7 +12,7 @@ $(tput smul)System Status$(tput rmul)
 - IP Adresses       = $(tput dim)public:$(tput sgr0) `echo $IP`;	$(tput dim)private:$(tput sgr0)  `hostname -I`
 - CPU Status        = $(tput dim)usage:$(tput sgr0) `echo $CPUTIME / $CPUCORES | bc`%;    $(tput dim)temp:$(tput sgr0) `echo $cpuTemp0 | bc`
 - Disk Space Used   = $(tput dim)internal:$(tput sgr0) `df | head -n 2 | tail -n 1 | awk {'print $5'}`;
-- Uptime            = $(tput dim)$(tput sgr0)`uptime | awk {'print $3,$4'} | cut -d ',' -f1`;
+- Uptime            = $(tput dim)$(tput sgr0)`uptime | awk {'print $3,$4'} | cut -d ',' -f1`; Percent Up = $(tput dim)$(tput sgr0)`uprecords | tail -n 1 | awk {'print$2'} | cut -d '.' -f1`%;
 
 
 $(tput smul)Service Status$(tput rmul)
