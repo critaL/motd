@@ -31,7 +31,7 @@ do
     STATUSTABLE+=(" - $SERVICE $(echo -en "= \e[32m")Running$(echo -en "\e[0m")\n")
   else
     STATUSTABLE+=(" - $SERVICE $(echo -en "= \e[31m")Dead$(echo -en "\e[0m")\n")
-    python3 /home/noordan/service_check/service_check.py $SERVICE;
+    python3 /home/noordan/service_check/service_check.py $SERVICES[$SERVICE];
   fi
 done
 printf "${STATUSTABLE[*]}" | column -t`
