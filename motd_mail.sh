@@ -13,7 +13,7 @@ declare -A SERVICES=(
   ['PHP']='php7.0-fpm.service'
   ['fail2ban']='fail2ban.service'
   ['MySQL']='mysql'
-  ['UFW']='ufw'
+  ['ufw']='ufw'
 )
 
 #service_check can be found here: https://github.com/noordan/service_check.git
@@ -27,7 +27,7 @@ $(tput smul)System Status$(tput rmul)
 `echo -e "\e[4mService status\e[0m"
 for SERVICE in ${!SERVICES[@]}
 do
-  STATUS=$(sudo systemctl status ${SERVICES[$SERVICE]} --no-pager | grep -c "Active: active (running)")
+  STATUS=$(sudo systemctl status ${SERVICES[$SERVICE]} --no-pager | grep -c "Active: active")
   if [[ $STATUS > 0 ]]
   then
     STATUSTABLE+=(" - $SERVICE $(echo -en "= \e[32m")Running$(echo -en "\e[0m")\n")
